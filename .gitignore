@@ -1,1 +1,38 @@
-*.venv
+# Python
+# ---------------------------------
+# Direktori virtual environment
+/.venv/
+/venv/
+/env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# File distribusi/instalasi
+*.whl
+*.egg-info/
+dist/
+build/
+
+# Database
+# ---------------------------------
+*.db
+*.sqlite
+*.sqlite3
+
+# File spesifik sistem operasi
+# ---------------------------------
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# MacOS
+.DS_Store
+
+# File spesifik IDE/Editor
+# ---------------------------------
+.idea/
+.vscode/
