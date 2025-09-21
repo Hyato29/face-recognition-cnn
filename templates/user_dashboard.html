@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Pengguna - Absensi Guru</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <aside>
+        <div class="admin-avatar">
+            <!-- Ganti dengan avatar default atau foto profil user jika ada -->
+            <img src="{{ url_for('static', filename='images/admin.jpeg') }}" alt="User">
+            <p>{{ user or 'Pengguna' }}</p>
+        </div>
+        <!-- Link Dashboard disesuaikan -->
+        <a href="{{ url_for('user_dashboard') }}" class="active">🏠 Dashboard</a>
+        <!-- Menu yang bisa diakses user -->
+        <a href="{{ url_for('pindai_wajah') }}">👁️ Pindai Wajah</a>
+    </aside>
+
+    <header>
+        <img src="{{ url_for('static', filename='images/unhas.jpg') }}" alt="Logo Unhas">
+        <h1>SELAMAT DATANG DI WEBSITE ABSENSI GURU MTS NW PERIGI</h1>
+        <a href="{{ url_for('logout') }}" class="logout-btn">🔒 Log Out</a>
+    </header>
+
+    <main>
+        <div class="dashboard-container">
+            <div class="welcome">
+                <h2>👋 Selamat Datang, {{ user }}!</h2>
+                <p>Gunakan menu di samping untuk melakukan absensi atau melihat rekap data.</p>
+            </div>
+
+            <div class="stats-row">
+                 <a href="{{ url_for('pindai_wajah') }}" class="card-link">
+                    <div class="card-stat card-hadir">
+                        <h4>👁️ Pindai Wajah</h4>
+                        <p>Klik di sini untuk melakukan absensi masuk atau keluar.</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="motivation">
+                “Pendidikan adalah senjata paling ampuh untuk mengubah dunia.” – Nelson Mandela
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
+    </footer>
+
+</body>
+</html>

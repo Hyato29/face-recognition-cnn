@@ -1,5 +1,11 @@
-flask
-opencv-python
-face_recognition
-numpy
+Flask
 werkzeug
+requests
+requests_oauthlib
+face_recognition
+opencv-python
+Pillow
+numpy
+google-api-python-client
+oauth2client
+Flask-MySQLdb
