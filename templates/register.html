@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Absensi Guru</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+</head>
+<body>
+
+    <div class="register-container">
+        <img src="{{ url_for('static', filename='images/unhas.jpg') }}" alt="Logo">
+        <h2>Buat Akun Baru</h2>
+        <form method="POST">
+            <div class="input-group">
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            <div class="input-group">
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <button type="button" class="toggle-password" onclick="togglePassword('password', this)">👁️</button>
+            </div>
+            <div class="input-group">
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Konfirmasi Password" required>
+                <button type="button" class="toggle-password" onclick="togglePassword('confirm_password', this)">👁️</button>
+            </div>
+            <button type="submit">Daftar</button>
+        </form>
+        <p>Sudah punya akun? <a href="{{ url_for('login') }}">Login di sini</a></p>
+    </div>
+
+    <footer>
+        &copy; 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/register.js') }}"></script>
+</body>
+</html>

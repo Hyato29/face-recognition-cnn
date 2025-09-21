@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<body class="{{ page_class }}">
+    <!-- Header -->
+    <header class="header">
+        <img src="{{ url_for('static', filename='images/website absensi guru/assets/images/unhas.jpg') }}" alt="unhas" class="header-unhas">
+        <h1>{% block header_title %}Absensi Guru{% endblock %}</h1>
+        {% if session.admin %}
+        <a href="{{ url_for('logout') }}" class="logout-btn">Log Out</a>
+        {% endif %}
+    </header>
+
+    <!-- Sidebar -->
+    {% if session.admin %}
+    <aside class="sidebar">
+        <a href="{{ url_for('dashboard') }}">🏠 Beranda</a>
+        <a href="{{ url_for('data_guru') }}">👨‍🏫 Data Guru</a>
+        <a href="{{ url_for('pindai_wajah') }}">👁️ Pindai Wajah</a>
+        <a href="{{ url_for('absensi_masuk') }}">✔️ Absensi Masuk</a>
+        <a href="{{ url_for('absensi_keluar') }}">❌ Absensi Keluar</a>
+        <a href="{{ url_for('laporan') }}">📄 Rekap Data</a>
+    </aside>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
+
+
+ <!-- Footer -->
+    <footer class="footer">
+        &copy; 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
+    </footer>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Data Guru - Absensi Guru</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_guru.css') }}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <img src="{{ url_for('static', filename='images/unhas.jpg') }}" alt="Logo Unhas">
+        <h1>SELAMAT DATANG DI WEBSITE ABSENSI GURU MTS NW PERIGI</h1>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+
+    <!-- Form Edit -->
+    <div class="container">
+        <h2>👋 Selamat datang di Halaman Edit Data Guru</h2>
+        <p class="welcome">Silakan perbarui data guru dengan lengkap & akurat.</p>
+        <form method="POST">
+            <label for="nama">Nama Lengkap</label>
+            <input type="text" id="nama" name="nama" value="{{ guru['nama'] }}" required>
+
+            <label for="ttl">Tempat, Tanggal Lahir</label>
+            <input type="text" id="ttl" name="ttl" value="{{ guru['ttl'] }}" required>
+
+            <label for="jenis_kelamin">Jenis Kelamin</label>
+            <select id="jenis_kelamin" name="jenis_kelamin" required>
+                <option value="Laki-Laki" {% if guru['jenis_kelamin'] == 'Laki-Laki' %}selected{% endif %}>Laki-Laki</option>
+                <option value="Perempuan" {% if guru['jenis_kelamin'] == 'Perempuan' %}selected{% endif %}>Perempuan</option>
+            </select>
+
+            <label for="tahun_mulai_kerja">Tahun Mulai Kerja</label>
+            <input type="number" id="tahun_mulai_kerja" name="tahun_mulai_kerja" value="{{ guru['tahun_mulai_kerja'] }}" required>
+
+            <div class="buttons">
+                <a href="{{ url_for('data_guru') }}" class="btn btn-back">⬅️ Kembali</a>
+                <button type="submit" class="btn btn-save">💾 Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="motivasi">
+        <p><em>"Setiap hari adalah peluang baru untuk belajar, tumbuh, dan memberi yang terbaik. Jadilah hadir, bukan hanya secara fisik, tapi juga dengan semangat."</em></p>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
+    </footer>
+
+</body>
+</html>

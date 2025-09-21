@@ -1,0 +1,259 @@
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #eef2f9;
+    color: #333;
+}
+
+.container {
+    max-width: 700px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+h2 {
+    font-size: 28px;
+    color: #1a73e8;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px 24px;
+  max-width: 600px;
+  margin: 0 auto 30px auto;
+  background: #f9f9f9;
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  display: contents;
+}
+
+/* Kolom label */
+.form-grid label {
+  text-align: right;
+  font-weight: 600;
+  color: #333;
+  align-self: center;
+  font-size: 14px;
+  background-color: #e8f0fe; /* Warna biru muda */
+  padding: 8px;
+  border-radius: 6px;
+}
+
+/* Kolom input */
+.form-grid input,
+.form-grid select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: #ffffff; /* Warna dasar putih */
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-grid input:focus,
+.form-grid select:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+  outline: none;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    padding: 15px 20px;
+  }
+
+  .form-grid label {
+    text-align: left;
+    margin-bottom: 4px;
+  }
+
+  .form-grid label,
+  .form-grid input,
+  .form-grid select {
+    background-color: #f0f4f8; /* Warna seragam untuk mode mobile */
+  }
+}
+
+#video {
+    border: 3px solid #1a73e8;
+    border-radius: 10px;
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    background: #dbeafe;
+}
+
+button {
+    padding: 10px 16px;
+    font-size: 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+    font-weight: 600;
+    color: #fff;
+    margin: 5px;
+}
+
+.capture-btn {
+    background-color: #2563eb;
+}
+
+.capture-btn:hover {
+    background-color: #1d4ed8;
+}
+
+.save-btn {
+    background-color: #16a34a;
+}
+
+.save-btn:hover {
+    background-color: #15803d;
+}
+
+.disabled-btn {
+    background-color: #f87171;
+}
+
+.disabled-btn:hover {
+    background-color: #dc2626;
+}
+
+
+.capture-btn {
+    background-color: #2563eb;
+}
+
+.capture-btn:hover {
+    background-color: #1d4ed8;
+}
+
+.save-btn {
+    background-color: #16a34a;
+}
+
+.save-btn:hover {
+    background-color: #15803d;
+}
+
+.disabled-btn {
+    background-color: #f87171;
+}
+
+.disabled-btn:hover {
+    background-color: #dc2626;
+}
+
+#camera-status {
+    font-size: 14px;
+    color: #dc2626;
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+.pose-guide-modern {
+    background: #f4f9ff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-top: 30px;
+    text-align: center;
+}
+
+.pose-guide-modern h3 {
+    font-size: 20px;
+    color: #1a3e7a;
+    margin-bottom: 20px;
+}
+
+.pose-steps {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.pose-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 130px;
+    padding: 18px 12px;
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.pose-item:hover {
+    transform: scale(1.08);
+}
+
+/* Warna background berbeda */
+.pose-blue {
+    background-color: #3498db;
+}
+
+.pose-green {
+    background-color: #27ae60;
+}
+
+.pose-yellow {
+    background-color: #f1c40f;
+    color: #333;
+}
+
+.pose-red {
+    background-color: #e74c3c;
+}
+
+.pose-purple {
+    background-color: #8e44ad;
+}
+
+.pose-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.pose-desc {
+    font-size: 14px;
+    text-align: center;
+}
+
+#status {
+  margin-top: 20px;
+  font-weight: bold;
+  color: green;
+}
+
+.preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.preview-container img {
+  width: 100px;
+  height: auto;
+  margin: 5px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+}

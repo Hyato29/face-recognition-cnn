@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Guru - Absensi Guru</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/data_guru.css') }}">
+</head>
+<body>
+  <aside>
+    <div class="admin-avatar">
+      <img src="{{ url_for('static', filename='images/admin.jpeg') }}" alt="Admin">
+      <p>Admin</p>
+    </div>
+    <a href="{{ url_for('dashboard') }}">🏠 Dashboard</a>
+    <a href="{{ url_for('data_guru') }}" class="active">👨‍🏫 Data Guru</a>
+    <a href="{{ url_for('pindai_wajah') }}">👁️ Pindai Wajah</a>
+    <a href="{{ url_for('laporan') }}">📄 Rekap Data</a>
+  </aside>
+
+  <header>
+    <img src="{{ url_for('static', filename='images/unhas.jpg') }}" alt="Logo Unhas">
+    <h1>SELAMAT DATANG DI WEBSITE ABSENSI GURU MTS NW PERIGI</h1>
+    <a href="{{ url_for('logout') }}" class="logout-btn">🔒 Logout</a>
+  </header>
+
+  <main>
+    <div class="welcome-message">
+      <h2>🎉 Selamat Datang di Halaman Data Guru</h2>
+      <p>Silakan kelola data guru dengan teliti dan penuh tanggung jawab.</p>
+    </div>
+
+    <h2>📋 Daftar Guru</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama</th>
+          <th>TTL</th>
+          <th>L/P</th>
+          <th>Mulai Kerja</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for guru in gurus %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ guru['nama'] }}</td>
+          <td>{{ guru['ttl'] }}</td>
+          <td>{{ guru['jenis_kelamin'] }}</td>
+          <td>{{ guru['tahun_mulai_kerja'] }}</td>
+          <td>
+            <a href="{{ url_for('edit_guru', id=guru['id']) }}" class="btn-edit">📝 Edit</a>
+            <a href="{{ url_for('hapus_guru', id=guru['id']) }}" class="btn-delete">🗑️ Hapus</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert-success">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="motivation-message">
+      “Pendidikan bukan hanya tentang mengisi wadah yang kosong, tetapi menyalakan api semangat.”
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
+  </footer>
+</body>
+</html>

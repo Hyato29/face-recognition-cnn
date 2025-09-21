@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Daftarkan Wajah Guru</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/register_face.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h2>Registrasi Wajah Guru</h2>
+    <form id="faceForm" class="form-grid">
+  <label for="nama">Nama Guru</label>
+  <input type="text" name="nama" id="nama" placeholder="Masukkan nama guru" required>
+
+  <label for="ttl">Tempat, Tanggal Lahir</label>
+  <input type="text" name="ttl" id="ttl" placeholder="Tempat, Tanggal Lahir">
+
+  <label for="jenis_kelamin">Jenis Kelamin</label>
+  <select name="jenis_kelamin" id="jenis_kelamin">
+    <option value="">Pilih Jenis Kelamin</option>
+    <option value="Laki-laki">Laki-laki</option>
+    <option value="Perempuan">Perempuan</option>
+  </select>
+
+  <label for="tahun_mulai_kerja">Tahun Mulai Kerja</label>
+  <input type="number" name="tahun_mulai_kerja" id="tahun_mulai_kerja" placeholder="Tahun Mulai Kerja">
+</form>
+
+
+    <video id="video" autoplay muted playsinline></video>
+    <div id="previewContainer"></div>
+
+    <div style="margin-top: 10px;">
+      <button id="captureBtn" class="capture-btn">📸 Ambil Gambar Pose</button>
+      <button id="saveBtn" class="save-btn">💾 Simpan Wajah ke Dataset</button>
+      <button id="stopCameraBtn" class="disabled-btn">🛑 Matikan Kamera</button>
+    </div>
+
+    <div id="status"></div>
+  </div>
+
+  <div class="pose-guide-modern">
+    <h3>📌 Panduan 5 Pose Wajah</h3>
+    <div class="pose-steps">
+      <div class="pose-item pose-blue">
+        <div class="pose-icon">🧍‍♂️</div>
+        <div class="pose-desc">Lurus ke Depan</div>
+      </div>
+      <div class="pose-item pose-green">
+        <div class="pose-icon">↪️</div>
+        <div class="pose-desc">Menoleh Kanan</div>
+      </div>
+      <div class="pose-item pose-yellow">
+        <div class="pose-icon">↩️</div>
+        <div class="pose-desc">Menoleh Kiri</div>
+      </div>
+      <div class="pose-item pose-red">
+        <div class="pose-icon">🔻</div>
+        <div class="pose-desc">Menunduk</div>
+      </div>
+      <div class="pose-item pose-purple">
+        <div class="pose-icon">🔺</div>
+        <div class="pose-desc">Menengadah</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+  <script src="{{ url_for('static', filename='js/register_face.js') }}"></script>
+</body>
+</html>

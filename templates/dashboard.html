@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Absensi Guru</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <aside>
+        <div class="admin-avatar">
+            <img src="{{ url_for('static', filename='images/admin.jpeg') }}" alt="Admin">
+            <p>Admin</p>
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="active">🏠 Dashboard</a>
+        <a href="{{ url_for('data_guru') }}">👨‍🏫 Data Guru</a>
+        <a href="{{ url_for('pindai_wajah') }}">👁️ Pindai Wajah</a>
+        <a href="{{ url_for('laporan') }}">📄 Rekap Data</a>
+    </aside>
+
+    <header>
+        <img src="{{ url_for('static', filename='images/unhas.jpg') }}" alt="Logo Unhas">
+        <h1>SELAMAT DATANG DI WEBSITE ABSENSI GURU MTS NW PERIGI</h1>
+        <a href="{{ url_for('logout') }}" class="logout-btn">🔒 Log Out</a>
+    </header>
+
+    <main>
+        <div class="dashboard-container">
+            <div class="welcome">
+                <h2>👋 Selamat Datang di Dashboard</h2>
+                <p>Terima kasih telah menjaga kehadiran dengan baik.<br>Semoga hari Anda penuh semangat dan produktif! 🌟</p>
+            </div>
+
+            <section class="face-register-section">
+                <h2>📸 Registrasi Wajah Guru</h2>
+                <p>Silakan klik tombol di bawah ini untuk masuk ke halaman registrasi wajah dengan 5 pose.</p>
+                <a href="{{ url_for('register_face') }}" class="register-face-btn">🔒 Daftarkan Wajah</a>
+            </section>
+
+            <div class="stats-row">
+                <div class="card-stat card-total">
+                    <h4>👥 Jumlah Guru</h4>
+                    <p style="font-size: 28px;">{{ jumlah_guru }}</p>
+                </div>
+                <div class="card-stat card-hadir">
+                    <h4>✔️ Hadir</h4>
+                    <p style="font-size: 28px;">{{ jumlah_hadir | default(0) }}</p>
+                </div>
+                <div class="card-stat card-belum">
+                    <h4>❌ Belum Hadir</h4>
+                    <p style="font-size: 28px;">{{ jumlah_belum_hadir | default(0) }}</p>
+                </div>
+            </div>
+
+            <div class="grafik-wrapper" style="max-width: 800px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 16px; box-shadow: 0 0 12px rgba(0,0,0,0.1);">
+                <h2 style="text-align:center; margin-bottom: 20px;">📊 Grafik Kehadiran 30 Hari</h2>
+                <canvas id="absenChart" height="300"></canvas>
+                <div style="text-align:center; margin-top: 20px;">
+                    <button id="downloadChartBtn" class="custom-download-btn">
+                        <i class="fas fa-download"></i> Download Grafik
+                    </button>
+                </div>
+            </div>
+
+            <div class="libur-wrapper">
+                <h2 class="libur-title">📅 Hari Libur Nasional 2025</h2>
+                <ul id="daftar-libur" class="libur-list"></ul>
+            </div>
+            
+            <div class="motivation">
+                “Pendidikan adalah senjata paling ampuh untuk mengubah dunia.” – Nelson Mandela
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
+    </footer>
+
+    <!-- Data untuk Chart dan Hari Libur -->
+<script id="chart-data"
+    data-labels='["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"]'
+    data-hadir='[20, 22, 18, 19, 23, 20, 0, 0, 0, 0, 0, 0]'
+    data-belum-hadir='[5, 3, 7, 6, 2, 4, 0, 0, 0, 0, 0, 0]'
+    data-hari-libur='[
+        {"tanggal": "2025-01-01", "keterangan": "Tahun Baru Masehi 2025"},
+        {"tanggal": "2025-01-27", "keterangan": "Isra Miraj Nabi Muhammad SAW"},
+        {"tanggal": "2025-01-29", "keterangan": "Tahun Baru Imlek 2576"},
+        {"tanggal": "2025-03-29", "keterangan": "Hari Raya Nyepi"},
+        {"tanggal": "2025-03-30", "keterangan": "Hari Raya Idul Fitri 1446 H"},
+        {"tanggal": "2025-03-31", "keterangan": "Hari Raya Idul Fitri 1446 H (Hari Kedua)"},
+        {"tanggal": "2025-04-18", "keterangan": "Wafat Yesus Kristus"},
+        {"tanggal": "2025-04-20", "keterangan": "Hari Paskah"},
+        {"tanggal": "2025-05-01", "keterangan": "Hari Buruh Nasional"},
+        {"tanggal": "2025-05-12", "keterangan": "Hari Raya Waisak"},
+        {"tanggal": "2025-05-29", "keterangan": "Kenaikan Yesus Kristus"},
+        {"tanggal": "2025-06-01", "keterangan": "Hari Lahir Pancasila"},
+        {"tanggal": "2025-06-07", "keterangan": "Hari Raya Idul Adha"},
+        {"tanggal": "2025-06-27", "keterangan": "Tahun Baru Islam 1447 H"},
+        {"tanggal": "2025-08-17", "keterangan": "Hari Kemerdekaan Republik Indonesia"},
+        {"tanggal": "2025-09-05", "keterangan": "Maulid Nabi Muhammad SAW"},
+        {"tanggal": "2025-12-25", "keterangan": "Hari Raya Natal"}
+    ]'>
+</script>
+
+
+    <!-- JS Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/register_face.js') }}"></script>
+
+</body>
+</html>

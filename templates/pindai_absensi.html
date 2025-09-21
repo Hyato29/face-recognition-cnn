@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Pindai Wajah Absensi</title>
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/pindai.css') }}">
+</head>
+<body>
+    <h2>Pindai Wajah untuk Absensi</h2>
+    <video id="video" width="480" height="360" autoplay></video>
+    <canvas id="canvas" width="480" height="360" style="display: none;"></canvas>
+    <button onclick="captureAndSend()">Pindai Wajah</button>
+    <div id="message">Status akan muncul di sini...</div>
+
+    <script src="{{ url_for('static', filename='js/pindai.js') }}"></script>
+</body>
+</html>

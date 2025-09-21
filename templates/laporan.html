@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Rekap Data - Absensi Guru</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/rekap.css') }}">
+</head>
+<body>
+    <aside>
+        <div class="admin-avatar">
+            <img src="{{ url_for('static', filename='images/admin.jpeg') }}" alt="Admin">
+            <p>Admin</p>
+        </div>
+        <a href="{{ url_for('dashboard') }}">🏠 Beranda</a>
+        <a href="{{ url_for('data_guru') }}">👨‍🏫 Data Guru</a>
+        <a href="{{ url_for('pindai_wajah') }}">👁️ Pindai Wajah</a>
+        <a href="{{ url_for('laporan') }}" class="active">📄 Rekap Data</a>
+    </aside>
+
+    <header>
+        <img src="{{ url_for('static', filename='images/unhas.jpg') }}" alt="Logo Unhas">
+        <h1>SELAMAT DATANG DI WEBSITE ABSENSI GURU MTS NW PERIGI</h1>
+        <a href="{{ url_for('logout') }}" class="logout-btn">🔒 Log Out</a>
+    </header>
+
+    <main>
+        <div class="welcome">
+            <h2>📊 Selamat Datang di Halaman Rekap Data</h2>
+            <p>Lihat semua data absensi guru secara lengkap.</p>
+        </div>
+
+        {% if ucapan_motivasi %}
+        <div class="motivasi">
+            🌟 {{ ucapan_motivasi }}
+        </div>
+        {% endif %}
+
+        <div class="rekap-card">
+            <h3>📋 Rekap Absensi Guru</h3>
+            <table id="rekapTable">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Guru</th>
+                        <th>Tanggal</th>
+                        <th>Waktu Masuk</th>
+                        <th>Waktu Keluar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for data in laporan %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ data['nama'] }}</td>
+                    <td>{{ data['tanggal'] }}</td>
+                    <td>{{ data['waktu_masuk'] or '-' }}</td>
+                    <td>{{ data['waktu_keluar'] or '-' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <button id="downloadExcelBtn">⬇️ Download Excel</button>
+        </div>
+
+        <div class="motivation">
+            "Menjadi guru bukan hanya profesi, tapi panggilan hati. Terima kasih telah hadir dan menginspirasi hari ini!"📌 
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/rekap.js') }}"></script>
+</body>
+</html>

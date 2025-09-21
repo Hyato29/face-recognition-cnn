@@ -1,0 +1,137 @@
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+    background-color: #001f3f;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.navbar h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: #fff;
+}
+
+.navbar img {
+    height: 50px;
+    border-radius: 50%;
+}
+
+.logout-btn {
+    text-decoration: none;
+    color: #fff;
+    background-color: #ff4b2b;
+    padding: 10px 20px;
+    border-radius: 30px;
+    transition: 0.2s ease;
+}
+
+.logout-btn:hover {
+    background-color: #e03e20;
+}
+
+/* ===== MAIN CONTENT ===== */
+.container {
+    max-width: 700px;
+    background: #ffffff;
+    margin: 3rem auto;
+    padding: 2rem 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #001f3f;
+}
+
+label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: 500;
+    color: #001f3f;
+}
+
+input, select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 1rem;
+}
+
+input:focus, select:focus {
+    border-color: #001f3f;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 31, 63, 0.3);
+}
+
+.buttons {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.8rem 1.6rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+    text-align: center;
+}
+
+.btn-save {
+    background-color: #001f3f;
+    color: #fff;
+}
+
+.btn-back {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: scale(1.03);
+}
+
+footer {
+    text-align: center;
+    background-color: #001f3f;
+    color: #fff;
+    padding: 1rem;
+    margin-top: auto;
+    font-size: 0.9rem;
+}
+
+.motivasi {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #444;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Absensi Guru</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="login-container">
+            <img src="{{ url_for('static', filename='images/unhas.jpg') }}" alt="Logo UNHAS" class="login-logo">
+            <h2>Selamat Datang Admin</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="flash">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="/">
+                <input type="text" name="username" placeholder="Masukkan Username" required>
+                <input type="password" id="password" name="password" placeholder="Masukkan Password" required>
+                <span class="toggle-password" onclick="togglePassword()">👁️ Tampilkan</span>
+                <button type="submit">Login</button>
+            </form>
+
+            <a href="{{ url_for('login_google') }}" class="btn-google">Login dengan Google</a>
+
+            <div class="register-link">
+                Belum punya akun? <a href="/register">Daftar di sini</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>
