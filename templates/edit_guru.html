@@ -1,55 +1,35 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Data Guru - Absensi Guru</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_guru.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
-    <!-- Navbar -->
-    <div class="navbar">
-        <img src="{{ url_for('static', filename='images/unhas.jpg') }}" alt="Logo Unhas">
-        <h1>SELAMAT DATANG DI WEBSITE ABSENSI GURU MTS NW PERIGI</h1>
-        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
-    </div>
+{% block title %}Edit Guru{% endblock %}
 
-    <!-- Form Edit -->
-    <div class="container">
-        <h2>👋 Selamat datang di Halaman Edit Data Guru</h2>
-        <p class="welcome">Silakan perbarui data guru dengan lengkap & akurat.</p>
-        <form method="POST">
-            <label for="nama">Nama Lengkap</label>
-            <input type="text" id="nama" name="nama" value="{{ guru['nama'] }}" required>
+{% block content %}
+<h1 class="text-3xl font-bold mb-6 text-white">Edit Data Guru</h1>
 
-            <label for="ttl">Tempat, Tanggal Lahir</label>
-            <input type="text" id="ttl" name="ttl" value="{{ guru['ttl'] }}" required>
-
-            <label for="jenis_kelamin">Jenis Kelamin</label>
-            <select id="jenis_kelamin" name="jenis_kelamin" required>
-                <option value="Laki-Laki" {% if guru['jenis_kelamin'] == 'Laki-Laki' %}selected{% endif %}>Laki-Laki</option>
+<div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg p-8 w-full max-w-lg mx-auto">
+    <form method="POST" class="space-y-4">
+        <div>
+            <label for="nama" class="block mb-2 text-sm font-medium text-gray-300">Nama Lengkap</label>
+            <input type="text" id="nama" name="nama" value="{{ guru['nama'] }}" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5" required>
+        </div>
+        <div>
+            <label for="ttl" class="block mb-2 text-sm font-medium text-gray-300">Tempat, Tanggal Lahir</label>
+            <input type="text" id="ttl" name="ttl" value="{{ guru['ttl'] }}" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5" required>
+        </div>
+        <div>
+            <label for="jenis_kelamin" class="block mb-2 text-sm font-medium text-gray-300">Jenis Kelamin</label>
+            <select id="jenis_kelamin" name="jenis_kelamin" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5" required>
+                <option value="Laki-laki" {% if guru['jenis_kelamin'] == 'Laki-laki' %}selected{% endif %}>Laki-laki</option>
                 <option value="Perempuan" {% if guru['jenis_kelamin'] == 'Perempuan' %}selected{% endif %}>Perempuan</option>
             </select>
-
-            <label for="tahun_mulai_kerja">Tahun Mulai Kerja</label>
-            <input type="number" id="tahun_mulai_kerja" name="tahun_mulai_kerja" value="{{ guru['tahun_mulai_kerja'] }}" required>
-
-            <div class="buttons">
-                <a href="{{ url_for('data_guru') }}" class="btn btn-back">⬅️ Kembali</a>
-                <button type="submit" class="btn btn-save">💾 Simpan Perubahan</button>
-            </div>
-        </form>
-    </div>
-
-    <div class="motivasi">
-        <p><em>"Setiap hari adalah peluang baru untuk belajar, tumbuh, dan memberi yang terbaik. Jadilah hadir, bukan hanya secara fisik, tapi juga dengan semangat."</em></p>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        © 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
-    </footer>
-
-</body>
-</html>
+        </div>
+        <div>
+            <label for="tahun_mulai_kerja" class="block mb-2 text-sm font-medium text-gray-300">Tahun Mulai Kerja</label>
+            <input type="number" id="tahun_mulai_kerja" name="tahun_mulai_kerja" value="{{ guru['tahun_mulai_kerja'] }}" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5" required>
+        </div>
+        <div class="flex justify-end gap-4 pt-4">
+            <a href="{{ url_for('data_guru') }}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">Kembali</a>
+            <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg">Simpan Perubahan</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

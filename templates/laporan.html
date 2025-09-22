@@ -1,78 +1,40 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Rekap Data - Absensi Guru</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/rekap.css') }}">
-</head>
-<body>
-    <aside>
-        <div class="admin-avatar">
-            <img src="{{ url_for('static', filename='images/admin.jpeg') }}" alt="Admin">
-            <p>Admin</p>
-        </div>
-        <a href="{{ url_for('dashboard') }}">🏠 Beranda</a>
-        <a href="{{ url_for('data_guru') }}">👨‍🏫 Data Guru</a>
-        <a href="{{ url_for('pindai_wajah') }}">👁️ Pindai Wajah</a>
-        <a href="{{ url_for('laporan') }}" class="active">📄 Rekap Data</a>
-    </aside>
+{% extends "base.html" %}
 
-    <header>
-        <img src="{{ url_for('static', filename='images/unhas.jpg') }}" alt="Logo Unhas">
-        <h1>SELAMAT DATANG DI WEBSITE ABSENSI GURU MTS NW PERIGI</h1>
-        <a href="{{ url_for('logout') }}" class="logout-btn">🔒 Log Out</a>
-    </header>
+{% block title %}Laporan Absensi{% endblock %}
 
-    <main>
-        <div class="welcome">
-            <h2>📊 Selamat Datang di Halaman Rekap Data</h2>
-            <p>Lihat semua data absensi guru secara lengkap.</p>
-        </div>
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-white">Laporan Rekap Absensi</h1>
+    </div>
 
-        {% if ucapan_motivasi %}
-        <div class="motivasi">
-            🌟 {{ ucapan_motivasi }}
-        </div>
-        {% endif %}
-
-        <div class="rekap-card">
-            <h3>📋 Rekap Absensi Guru</h3>
-            <table id="rekapTable">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Guru</th>
-                        <th>Tanggal</th>
-                        <th>Waktu Masuk</th>
-                        <th>Waktu Keluar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for data in laporan %}
+<div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-300">
+            <thead class="text-xs text-gray-400 uppercase bg-gray-700">
                 <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ data['nama'] }}</td>
-                    <td>{{ data['tanggal'] }}</td>
-                    <td>{{ data['waktu_masuk'] or '-' }}</td>
-                    <td>{{ data['waktu_keluar'] or '-' }}</td>
+                    <th scope="col" class="px-6 py-3">No</th>
+                    <th scope="col" class="px-6 py-3">Nama Guru</th>
+                    <th scope="col" class="px-6 py-3">Tanggal</th>
+                    <th scope="col" class="px-6 py-3">Waktu Masuk</th>
+                    <th scope="col" class="px-6 py-3">Waktu Keluar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in laporan %}
+                <tr class="bg-gray-800 border-b border-gray-700 hover:bg-gray-600">
+                    <td class="px-6 py-4">{{ loop.index }}</td>
+                    <th scope="row" class="px-6 py-4 font-medium text-white whitespace-nowrap">{{ data.nama }}</th>
+                    <td class="px-6 py-4">{{ data.tanggal.strftime('%d %B %Y') }}</td>
+                    <td class="px-6 py-4">{{ data.waktu_masuk }}</td>
+                    <td class="px-6 py-4">{{ data.waktu_keluar or '-' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center py-4">Belum ada data absensi.</td>
                 </tr>
                 {% endfor %}
-                </tbody>
-            </table>
-
-            <button id="downloadExcelBtn">⬇️ Download Excel</button>
-        </div>
-
-        <div class="motivation">
-            "Menjadi guru bukan hanya profesi, tapi panggilan hati. Terima kasih telah hadir dan menginspirasi hari ini!"📌 
-        </div>
-    </main>
-
-    <footer>
-        &copy; 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
-    </footer>
-
-    <script src="{{ url_for('static', filename='js/rekap.js') }}"></script>
-</body>
-</html>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

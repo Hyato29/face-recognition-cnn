@@ -1,56 +1,21 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard Pengguna - Absensi Guru</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-</head>
+{% extends "base.html" %}
 
-<body>
-    <aside>
-        <div class="admin-avatar">
-            <!-- Ganti dengan avatar default atau foto profil user jika ada -->
-            <img src="{{ url_for('static', filename='images/admin.jpeg') }}" alt="User">
-            <p>{{ user or 'Pengguna' }}</p>
-        </div>
-        <!-- Link Dashboard disesuaikan -->
-        <a href="{{ url_for('user_dashboard') }}" class="active">🏠 Dashboard</a>
-        <!-- Menu yang bisa diakses user -->
-        <a href="{{ url_for('pindai_wajah') }}">👁️ Pindai Wajah</a>
-    </aside>
+{% block title %}Dashboard Pengguna{% endblock %}
 
-    <header>
-        <img src="{{ url_for('static', filename='images/unhas.jpg') }}" alt="Logo Unhas">
-        <h1>SELAMAT DATANG DI WEBSITE ABSENSI GURU MTS NW PERIGI</h1>
-        <a href="{{ url_for('logout') }}" class="logout-btn">🔒 Log Out</a>
-    </header>
+{% block content %}
+<div class="text-center">
+    <h1 class="text-4xl font-bold text-white mb-2">Selamat Datang, {{ user }}!</h1>
+    <p class="text-lg text-gray-400">Gunakan menu untuk memulai absensi atau melihat rekap data.</p>
+</div>
 
-    <main>
-        <div class="dashboard-container">
-            <div class="welcome">
-                <h2>👋 Selamat Datang, {{ user }}!</h2>
-                <p>Gunakan menu di samping untuk melakukan absensi atau melihat rekap data.</p>
-            </div>
-
-            <div class="stats-row">
-                 <a href="{{ url_for('pindai_wajah') }}" class="card-link">
-                    <div class="card-stat card-hadir">
-                        <h4>👁️ Pindai Wajah</h4>
-                        <p>Klik di sini untuk melakukan absensi masuk atau keluar.</p>
-                    </div>
-                </a>
-            </div>
-            
-            <div class="motivation">
-                “Pendidikan adalah senjata paling ampuh untuk mengubah dunia.” – Nelson Mandela
-            </div>
-        </div>
-    </main>
-
-    <footer>
-        &copy; 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
-    </footer>
-
-</body>
-</html>
+<div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+    <a href="{{ url_for('pindai_wajah') }}" class="block p-8 bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 hover:border-cyan-500 transition-all transform hover:-translate-y-1">
+        <h2 class="text-2xl font-bold text-cyan-400 mb-2">👁️ Pindai Wajah</h2>
+        <p class="text-gray-400">Klik di sini untuk melakukan absensi masuk atau keluar menggunakan wajah Anda.</p>
+    </a>
+    <a href="{{ url_for('laporan') }}" class="block p-8 bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 hover:border-cyan-500 transition-all transform hover:-translate-y-1">
+        <h2 class="text-2xl font-bold text-cyan-400 mb-2">📄 Rekap Data</h2>
+        <p class="text-gray-400">Lihat riwayat dan detail kehadiran semua guru.</p>
+    </a>
+</div>
+{% endblock %}

@@ -2,16 +2,174 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Pindai Wajah Absensi</title>
-     <link rel="stylesheet" href="{{ url_for('static', filename='css/pindai.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pindai Wajah - Absensi Guru</title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Font Poppins dari Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Memuat Library SweetAlert2 untuk notifikasi modern -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Menggunakan font Poppins sebagai font utama */
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        /* Style untuk efek loading spinner */
+        .loader {
+            border-top-color: #3498db;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        @-webkit-keyframes spinner {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body>
-    <h2>Pindai Wajah untuk Absensi</h2>
-    <video id="video" width="480" height="360" autoplay></video>
-    <canvas id="canvas" width="480" height="360" style="display: none;"></canvas>
-    <button onclick="captureAndSend()">Pindai Wajah</button>
-    <div id="message">Status akan muncul di sini...</div>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
 
-    <script src="{{ url_for('static', filename='js/pindai.js') }}"></script>
+    <div class="w-full max-w-2xl mx-auto p-6 md:p-8 bg-gray-800 rounded-2xl shadow-2xl text-center border-2 border-gray-700">
+
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-cyan-400">Pindai Wajah Absensi</h1>
+            <p class="text-gray-400 mt-2">Posisikan wajah Anda di tengah kamera dan tekan tombol Pindai.</p>
+        </div>
+
+        <!-- Area Kamera -->
+        <div class="relative w-full aspect-video bg-gray-900 rounded-xl overflow-hidden border-2 border-dashed border-gray-600 mb-6 flex items-center justify-center">
+            <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
+            <div id="camera-placeholder" class="text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.55a2 2 0 01.45 2.95A10 10 0 115.5 8.95a2 2 0 012.95-.45L13 10z" />
+                </svg>
+                <p>Mengaktifkan kamera...</p>
+            </div>
+            <!-- Canvas tersembunyi untuk mengambil gambar -->
+            <canvas id="canvas" class="hidden"></canvas>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button id="scan-button" class="w-full sm:w-auto bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cyan-500/30 flex items-center justify-center gap-2" disabled>
+                <!-- Ikon Kamera -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Pindai Sekarang</span>
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-all duration-300">
+                Kembali
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const scanButton = document.getElementById('scan-button');
+        const cameraPlaceholder = document.getElementById('camera-placeholder');
+        const context = canvas.getContext('2d');
+
+        // Fungsi untuk mengaktifkan kamera
+        async function setupCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+                video.srcObject = stream;
+                video.addEventListener('loadedmetadata', () => {
+                    // Sembunyikan placeholder dan aktifkan tombol setelah kamera siap
+                    cameraPlaceholder.classList.add('hidden');
+                    scanButton.disabled = false;
+                    scanButton.classList.remove('cursor-not-allowed');
+                });
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+                cameraPlaceholder.innerHTML = `<p class="text-red-400">❌ Gagal mengakses kamera. Pastikan Anda memberikan izin.</p>`;
+                // Tampilkan notifikasi error jika kamera gagal diakses
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kamera Error',
+                    text: 'Gagal mengakses kamera. Pastikan Anda telah memberikan izin pada browser.',
+                    confirmButtonColor: '#06b6d4',
+                });
+            }
+        }
+
+        // Fungsi untuk mengambil gambar dan mengirim ke server
+        async function captureAndSend() {
+            // Tampilkan notifikasi loading saat proses berjalan
+            Swal.fire({
+                title: 'Memindai Wajah...',
+                text: 'Mohon tunggu sebentar, sistem sedang mengenali wajah Anda.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Sesuaikan ukuran canvas dengan video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            // Gambar frame video saat ini ke canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Konversi gambar di canvas menjadi format data URL (base64)
+            const dataUrl = canvas.toDataURL('image/jpeg');
+
+            try {
+                // Kirim data gambar ke endpoint Flask menggunakan fetch API
+                const response = await fetch("{{ url_for('pindai_wajah') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `image=${encodeURIComponent(dataUrl)}`
+                });
+                
+                // Ambil respons dari server dalam format JSON
+                const result = await response.json();
+
+                // Tampilkan notifikasi berdasarkan respons dari server
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: result.message,
+                        confirmButtonColor: '#06b6d4',
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: result.message || 'Terjadi kesalahan saat memindai.',
+                        confirmButtonColor: '#06b6d4',
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Terjadi kesalahan saat mengirim data ke server.',
+                    confirmButtonColor: '#06b6d4',
+                });
+            }
+        }
+
+        // Tambahkan event listener ke tombol pindai
+        scanButton.addEventListener('click', captureAndSend);
+        
+        // Panggil fungsi untuk mengaktifkan kamera saat halaman dimuat
+        setupCamera();
+
+    </script>
+
 </body>
 </html>

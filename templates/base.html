@@ -1,49 +1,71 @@
 <!DOCTYPE html>
 <html lang="id">
-<body class="{{ page_class }}">
-    <!-- Header -->
-    <header class="header">
-        <img src="{{ url_for('static', filename='images/website absensi guru/assets/images/unhas.jpg') }}" alt="unhas" class="header-unhas">
-        <h1>{% block header_title %}Absensi Guru{% endblock %}</h1>
-        {% if session.admin %}
-        <a href="{{ url_for('logout') }}" class="logout-btn">Log Out</a>
-        {% endif %}
-    </header>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Absensi Guru{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
 
-    <!-- Sidebar -->
-    {% if session.admin %}
-    <aside class="sidebar">
-        <a href="{{ url_for('dashboard') }}">🏠 Beranda</a>
-        <a href="{{ url_for('data_guru') }}">👨‍🏫 Data Guru</a>
-        <a href="{{ url_for('pindai_wajah') }}">👁️ Pindai Wajah</a>
-        <a href="{{ url_for('absensi_masuk') }}">✔️ Absensi Masuk</a>
-        <a href="{{ url_for('absensi_keluar') }}">❌ Absensi Keluar</a>
-        <a href="{{ url_for('laporan') }}">📄 Rekap Data</a>
-    </aside>
-    {% endif %}
+    <div class="flex min-h-screen">
+        <aside class="w-64 bg-gray-800 p-4 flex-col border-r border-gray-700 hidden lg:flex">
+            <div class="text-center mb-10">
+                <img src="{{ url_for('static', filename='images/admin.jpeg') }}" alt="Avatar" class="w-24 h-24 rounded-full mx-auto mb-2 border-4 border-cyan-500">
+                <h2 class="text-xl font-semibold">{{ session.get('admin') or session.get('user') }}</h2>
+                <span class="text-sm text-gray-400">{{ 'Administrator' if 'admin' in session else 'Pengguna' }}</span>
+            </div>
+            <nav class="flex flex-col gap-2">
+                {% if 'admin' in session %}
+                    <a href="{{ url_for('dashboard') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors {% if request.endpoint == 'dashboard' %}bg-cyan-500/20 text-cyan-300{% endif %}">
+                        <span>🏠</span> Dashboard
+                    </a>
+                    <a href="{{ url_for('data_guru') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors {% if request.endpoint == 'data_guru' %}bg-cyan-500/20 text-cyan-300{% endif %}">
+                        <span>👨‍🏫</span> Data Guru
+                    </a>
+                    <a href="{{ url_for('register_face') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors {% if request.endpoint == 'register_face' %}bg-cyan-500/20 text-cyan-300{% endif %}">
+                        <span>📸</span> Daftarkan Wajah
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('user_dashboard') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors {% if request.endpoint == 'user_dashboard' %}bg-cyan-500/20 text-cyan-300{% endif %}">
+                        <span>🏠</span> Dashboard
+                    </a>
+                {% endif %}
+                
+                <a href="{{ url_for('pindai_wajah') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors {% if request.endpoint == 'pindai_wajah' %}bg-cyan-500/20 text-cyan-300{% endif %}">
+                    <span>👁️</span> Pindai Absensi
+                </a>
+                <a href="{{ url_for('laporan') }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-700 rounded-lg transition-colors {% if request.endpoint == 'laporan' %}bg-cyan-500/20 text-cyan-300{% endif %}">
+                    <span>📄</span> Rekap Data
+                </a>
+            </nav>
+            <a href="{{ url_for('logout') }}" class="mt-auto flex items-center gap-3 px-4 py-3 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-lg transition-colors">
+                <span>🔒</span> Log Out
+            </a>
+        </aside>
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash-messages">
-          {% for category, message in messages %}
-            <div class="flash {{ category }}">{{ message }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="mb-4 p-4 text-sm rounded-lg 
+                    {% if category == 'danger' %} bg-red-500/20 text-red-300 
+                    {% elif category == 'success' %} bg-green-500/20 text-green-300 
+                    {% else %} bg-yellow-500/20 text-yellow-300 
+                    {% endif %}">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        {% block content %}{% endblock %}
-    </main>
-</body>
-</html>
-
-
- <!-- Footer -->
-    <footer class="footer">
-        &copy; 2025 Absensi Guru MTS NW Perigi | esa pania ❤️
-    </footer>
 </body>
 </html>

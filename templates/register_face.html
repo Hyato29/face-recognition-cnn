@@ -1,71 +1,119 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Daftarkan Wajah Guru</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/register_face.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftarkan Wajah Guru - Absensi Wajah</title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Font Poppins dari Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Memuat Library SweetAlert2 untuk notifikasi modern -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <h2>Registrasi Wajah Guru</h2>
-    <form id="faceForm" class="form-grid">
-  <label for="nama">Nama Guru</label>
-  <input type="text" name="nama" id="nama" placeholder="Masukkan nama guru" required>
+<body class="bg-gray-900 text-white min-h-screen p-4 sm:p-6 lg:p-8">
 
-  <label for="ttl">Tempat, Tanggal Lahir</label>
-  <input type="text" name="ttl" id="ttl" placeholder="Tempat, Tanggal Lahir">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-cyan-400">Registrasi Wajah Guru</h1>
+            <p class="text-gray-400 mt-2">Lengkapi data dan ambil 5 pose wajah sesuai panduan.</p>
+        </div>
 
-  <label for="jenis_kelamin">Jenis Kelamin</label>
-  <select name="jenis_kelamin" id="jenis_kelamin">
-    <option value="">Pilih Jenis Kelamin</option>
-    <option value="Laki-laki">Laki-laki</option>
-    <option value="Perempuan">Perempuan</option>
-  </select>
+        <!-- Konten Utama: Grid 2 Kolom -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-  <label for="tahun_mulai_kerja">Tahun Mulai Kerja</label>
-  <input type="number" name="tahun_mulai_kerja" id="tahun_mulai_kerja" placeholder="Tahun Mulai Kerja">
-</form>
+            <!-- Kolom Kiri: Form & Panduan Pose -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 flex flex-col gap-6">
+                <!-- Formulir Data Guru -->
+                <!-- PERBAIKAN: Menambahkan atribut data-action untuk menyimpan URL -->
+                <form id="faceForm" class="space-y-4" data-save-url="{{ url_for('save_faces') }}">
+                    <div>
+                        <label for="nama" class="block mb-2 text-sm font-medium text-gray-300">Nama Guru</label>
+                        <input type="text" name="nama" id="nama" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5" placeholder="Masukkan nama lengkap" required>
+                    </div>
+                    <div>
+                        <label for="ttl" class="block mb-2 text-sm font-medium text-gray-300">Tempat, Tanggal Lahir</label>
+                        <input type="text" name="ttl" id="ttl" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5" placeholder="Contoh: Jakarta, 17 Agustus 1990">
+                    </div>
+                    <div>
+                        <label for="jenis_kelamin" class="block mb-2 text-sm font-medium text-gray-300">Jenis Kelamin</label>
+                        <select name="jenis_kelamin" id="jenis_kelamin" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5">
+                            <option value="">Pilih Jenis Kelamin</option>
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="tahun_mulai_kerja" class="block mb-2 text-sm font-medium text-gray-300">Tahun Mulai Kerja</label>
+                        <input type="number" name="tahun_mulai_kerja" id="tahun_mulai_kerja" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5" placeholder="Contoh: 2015">
+                    </div>
+                </form>
 
+                <!-- Panduan Pose -->
+                <div>
+                    <h3 class="font-semibold text-lg text-cyan-400 mb-3">Panduan 5 Pose Wajah</h3>
+                    <div id="pose-guide" class="grid grid-cols-5 gap-2 text-center text-xs">
+                        <div id="pose-1" class="p-2 bg-gray-700 rounded-lg border-2 border-gray-700 transition-all">
+                            <span class="text-2xl">😐</span><p>Depan</p>
+                        </div>
+                        <div id="pose-2" class="p-2 bg-gray-700 rounded-lg border-2 border-gray-700 transition-all">
+                            <span class="text-2xl">👉</span><p>Kanan</p>
+                        </div>
+                        <div id="pose-3" class="p-2 bg-gray-700 rounded-lg border-2 border-gray-700 transition-all">
+                            <span class="text-2xl">👈</span><p>Kiri</p>
+                        </div>
+                        <div id="pose-4" class="p-2 bg-gray-700 rounded-lg border-2 border-gray-700 transition-all">
+                            <span class="text-2xl">👆</span><p>Atas</p>
+                        </div>
+                        <div id="pose-5" class="p-2 bg-gray-700 rounded-lg border-2 border-gray-700 transition-all">
+                            <span class="text-2xl">👇</span><p>Bawah</p>
+                        </div>
+                    </div>
+                </div>
+                 <a href="{{ url_for('dashboard') }}" class="w-full text-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
+                    Kembali ke Dashboard
+                </a>
+            </div>
 
-    <video id="video" autoplay muted playsinline></video>
-    <div id="previewContainer"></div>
+            <!-- Kolom Kanan: Kamera & Hasil -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 flex flex-col gap-6">
+                 <!-- Area Kamera -->
+                <div class="relative w-full aspect-video bg-gray-900 rounded-xl overflow-hidden border-2 border-dashed border-gray-600 flex items-center justify-center">
+                    <video id="video" autoplay muted playsinline class="w-full h-full object-cover"></video>
+                    <div id="camera-placeholder" class="text-gray-500">
+                         <p>Mengaktifkan kamera...</p>
+                    </div>
+                     <!-- Canvas tersembunyi untuk mengambil gambar -->
+                    <canvas id="canvas" class="hidden"></canvas>
+                </div>
+                
+                <!-- Pratinjau Pose yang Diambil -->
+                <div>
+                    <h3 class="font-semibold text-lg text-cyan-400 mb-3">Pratinjau Pose (<span id="captureCount">0</span>/5)</h3>
+                    <div id="previewContainer" class="grid grid-cols-5 gap-2">
+                        <!-- Gambar pratinjau akan ditambahkan di sini oleh JavaScript -->
+                    </div>
+                </div>
 
-    <div style="margin-top: 10px;">
-      <button id="captureBtn" class="capture-btn">📸 Ambil Gambar Pose</button>
-      <button id="saveBtn" class="save-btn">💾 Simpan Wajah ke Dataset</button>
-      <button id="stopCameraBtn" class="disabled-btn">🛑 Matikan Kamera</button>
+                <!-- Tombol Aksi -->
+                <div class="flex flex-col sm:flex-row gap-4 mt-auto">
+                    <button id="captureBtn" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2" disabled>
+                        <span>Ambil Gambar Pose</span>
+                    </button>
+                    <button id="saveBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-all duration-300 flex items-center justify-center gap-2" disabled>
+                        <span>Simpan Dataset</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="status"></div>
-  </div>
-
-  <div class="pose-guide-modern">
-    <h3>📌 Panduan 5 Pose Wajah</h3>
-    <div class="pose-steps">
-      <div class="pose-item pose-blue">
-        <div class="pose-icon">🧍‍♂️</div>
-        <div class="pose-desc">Lurus ke Depan</div>
-      </div>
-      <div class="pose-item pose-green">
-        <div class="pose-icon">↪️</div>
-        <div class="pose-desc">Menoleh Kanan</div>
-      </div>
-      <div class="pose-item pose-yellow">
-        <div class="pose-icon">↩️</div>
-        <div class="pose-desc">Menoleh Kiri</div>
-      </div>
-      <div class="pose-item pose-red">
-        <div class="pose-icon">🔻</div>
-        <div class="pose-desc">Menunduk</div>
-      </div>
-      <div class="pose-item pose-purple">
-        <div class="pose-icon">🔺</div>
-        <div class="pose-desc">Menengadah</div>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
-  <script src="{{ url_for('static', filename='js/register_face.js') }}"></script>
+    <!-- Script JS dipindahkan ke file terpisah -->
+    <script src="{{ url_for('static', filename='js/register_face.js') }}"></script>
 </body>
 </html>
+
