@@ -1,42 +1,54 @@
-# recognizer.py — versi stabil (Windows-friendly)
+# recognizer.py — cepat & stabil (Windows-friendly)
+# - Cache encodings ke disk (static/cache/encodings.pkl)
+# - Loader kebal (PIL/face_recognition/OpenCV) → RGB uint8 C-contiguous writeable
+# - Deteksi HOG (ringan) + opsi fallback CNN (dimatikan default)
+# - Resize sebelum deteksi agar signifikan lebih cepat
+# - Opsi parallel encode (off default, nyalakan bila dataset besar)
+
 print("[DEBUG] recognizer loaded from:", __file__)
 
 import os
 import cv2
+import time
+import pickle
+import hashlib
 import numpy as np
 import face_recognition
+from typing import List, Tuple, Optional
 from PIL import Image, ImageOps, ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-# Opsional: dukung HEIC/HEIF (foto iPhone). Abaikan jika tidak terpasang.
+# Opsional: dukung HEIC/HEIF (foto iPhone)
 try:
     import pillow_heif
     pillow_heif.register_heif_opener()
 except Exception:
     pass
 
-# ====== Konfigurasi ======
-FACE_RECOGNITION_THRESHOLD = 0.55
-MAX_DETECT_WIDTH = 1600          # perkecil gambar lebar > 1600px sebelum deteksi
-UPSAMPLE_HOG = 1                 # 0/1 biasanya cukup
-USE_CNN_FALLBACK = True          # coba CNN jika HOG gagal
+# ====== Konfigurasi kecepatan/deteksi ======
+FACE_RECOGNITION_THRESHOLD = 0.55     # dipakai seperti sebelumnya: tolerance = 1 - THRESH
+MAX_DETECT_WIDTH = 960                # 1600 → 960 = jauh lebih cepat di CPU
+UPSAMPLE_HOG = 0                      # 0 cukup, 1 lebih teliti tapi lebih lambat
+USE_CNN_FALLBACK = False              # matikan biar cepat; set True kalau perlu
+VALID_EXTS = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tif', '.tiff', '.heic', '.heif')
 
-# ====== State ======
-KNOWN_ENCODINGS = []
-KNOWN_NAMES = []
+# ====== Cache ======
+CACHE_DIR = "static/cache"
+CACHE_PATH = os.path.join(CACHE_DIR, "encodings.pkl")
+
+# ====== State global ======
+KNOWN_ENCODINGS: List[np.ndarray] = []
+KNOWN_NAMES: List[str] = []
 FACES_LOADED = False
 
 
-# ---------- Utilitas gambar ----------
+# ---------- Utilitas umum ----------
 def _coerce_rgb_uint8_c_writeable(img: np.ndarray) -> np.ndarray:
-    """
-    Paksa array jadi RGB uint8 3-channel, C-contiguous dan writeable.
-    """
+    """Paksa array jadi RGB uint8 3-channel, C-contiguous & writeable."""
     if img.dtype != np.uint8:
         img = img.astype(np.uint8, copy=False)
 
-    # Pastikan 3-channel
     if img.ndim == 2:
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
     elif img.ndim == 3 and img.shape[2] == 4:
@@ -44,20 +56,15 @@ def _coerce_rgb_uint8_c_writeable(img: np.ndarray) -> np.ndarray:
     elif img.ndim == 3 and img.shape[2] != 3:
         raise ValueError(f"Channel tidak didukung: shape={img.shape}")
 
-    # Paksa C-contiguous + writeable
     img = np.require(img, dtype=np.uint8, requirements=['C', 'W'])
     if (not img.flags['C_CONTIGUOUS']) or (not img.flags['WRITEABLE']):
         img = np.array(img, dtype=np.uint8, order='C', copy=True)
 
-    # Jaga-jaga terakhir
-    img = np.ascontiguousarray(img)
-    return img
+    return np.ascontiguousarray(img)
 
 
 def _downscale_if_needed(img: np.ndarray, max_w: int = MAX_DETECT_WIDTH) -> np.ndarray:
-    """
-    Perkecil gambar yang terlalu besar agar deteksi stabil & cepat.
-    """
+    """Perkecil gambar besar agar deteksi stabil & cepat."""
     h, w = img.shape[:2]
     if w > max_w:
         new_w = max_w
@@ -95,7 +102,7 @@ def _load_image_rgb_uint8(path: str) -> np.ndarray:
 
     # Try 3 — OpenCV
     try:
-        data = np.fromfile(path, dtype=np.uint8)     # aman untuk path Windows
+        data = np.fromfile(path, dtype=np.uint8)     # aman utk path Windows
         bgr = cv2.imdecode(data, cv2.IMREAD_COLOR)   # BGR uint8
         if bgr is None:
             raise ValueError("cv2.imdecode gagal")
@@ -110,13 +117,11 @@ def _load_image_rgb_uint8(path: str) -> np.ndarray:
 def _detect_locations_rgb(img_rgb_uint8: np.ndarray):
     """
     Deteksi lokasi wajah dari gambar RGB uint8 kontigu.
-    Prioritas HOG, fallback CNN jika diaktifkan dan HOG error.
+    Prioritas HOG (ringan); fallback ke CNN jika diaktifkan.
     """
-    # Pastikan properti buffer
     img = _coerce_rgb_uint8_c_writeable(img_rgb_uint8)
     img = _downscale_if_needed(img, MAX_DETECT_WIDTH)
 
-    # HOG dulu
     try:
         return face_recognition.face_locations(
             img,
@@ -128,7 +133,7 @@ def _detect_locations_rgb(img_rgb_uint8: np.ndarray):
         if not USE_CNN_FALLBACK:
             raise
 
-    # Fallback CNN
+    # Fallback CNN (lambat; butuh dlib CNN detector internal)
     try:
         return face_recognition.face_locations(
             img,
@@ -140,11 +145,98 @@ def _detect_locations_rgb(img_rgb_uint8: np.ndarray):
         raise
 
 
+# ---------- Cache helper ----------
+def _dataset_signature(dataset_path: str) -> str:
+    """Fingerprint dataset berdasar path file + mtime + size (stabil & cepat)."""
+    h = hashlib.sha1()
+    if not os.path.isdir(dataset_path):
+        return ""
+    for person in sorted(os.listdir(dataset_path)):
+        pdir = os.path.join(dataset_path, person)
+        if not os.path.isdir(pdir):
+            continue
+        for fn in sorted(os.listdir(pdir)):
+            fp = os.path.join(pdir, fn)
+            if not os.path.isfile(fp):
+                continue
+            st = os.stat(fp)
+            h.update(person.encode("utf-8", errors="ignore"))
+            h.update(fn.encode("utf-8", errors="ignore"))
+            h.update(str(int(st.st_mtime)).encode("utf-8"))
+            h.update(str(st.st_size).encode("utf-8"))
+    return h.hexdigest()
+
+
+def _try_load_cache(dataset_path: str):
+    if not os.path.exists(CACHE_PATH):
+        return None
+    try:
+        with open(CACHE_PATH, "rb") as f:
+            data = pickle.load(f)
+        if data.get("dataset_sig") == _dataset_signature(dataset_path):
+            encs = data.get("encodings") or []
+            names = data.get("names") or []
+            print(f"[INFO] Loaded from cache: {len(encs)} encodings")
+            return encs, names
+    except Exception as e:
+        print("[WARN] Cache gagal dibaca:", e)
+    return None
+
+
+def _save_cache(dataset_path: str, encs, names):
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    data = {
+        "dataset_sig": _dataset_signature(dataset_path),
+        "encodings": encs,
+        "names": names,
+        "saved_at": time.time(),
+    }
+    with open(CACHE_PATH, "wb") as f:
+        pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+    print(f"[INFO] Cache disimpan: {CACHE_PATH} ({len(encs)} encodings)")
+
+
+def invalidate_cache():
+    """Opsional: panggil ini jika ingin paksa rebuild pada start berikutnya."""
+    try:
+        if os.path.exists(CACHE_PATH):
+            os.remove(CACHE_PATH)
+            print("[INFO] Cache dihapus.")
+    except Exception as e:
+        print("[WARN] Gagal hapus cache:", e)
+
+
+# ---------- Encoder satu file (untuk parallel/serial) ----------
+def _encode_one(file_path: str, person_name: str) -> Optional[Tuple[np.ndarray, str]]:
+    try:
+        img = _load_image_rgb_uint8(file_path)
+        img = _downscale_if_needed(img, MAX_DETECT_WIDTH)
+        img = _coerce_rgb_uint8_c_writeable(img)
+        locs = _detect_locations_rgb(img)
+        encs = face_recognition.face_encodings(img, locs)
+        if encs:
+            return (encs[0], person_name)
+    except Exception as e:
+        print(f"[ERROR] {file_path}: {e}")
+    return None
+
+
 # ---------- API utama ----------
-def load_known_faces(dataset_path='static/dataset'):
+def load_known_faces(
+    dataset_path: str = 'static/dataset',
+    use_cache: bool = True,
+    force_rebuild: bool = False,
+    use_parallel: bool = False,   # set True bila dataset besar dan bukan di debug-reloader
+):
+    """
+    Muat seluruh face encodings dari dataset.
+    - use_cache: ambil dari cache jika fingerprint dataset sama.
+    - force_rebuild: abaikan cache & hitung ulang.
+    - use_parallel: percepat dengan multiprocessing (hati2 di Windows + Flask debug).
+    """
     global KNOWN_ENCODINGS, KNOWN_NAMES, FACES_LOADED
 
-    if FACES_LOADED:
+    if FACES_LOADED and not force_rebuild:
         print("[INFO] Wajah sudah dimuat. Skip.")
         return
 
@@ -153,65 +245,73 @@ def load_known_faces(dataset_path='static/dataset'):
         print(f"[ERROR] Folder dataset '{dataset_path}' tidak ditemukan!")
         return
 
-    KNOWN_ENCODINGS, KNOWN_NAMES = [], []
-    valid_exts = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tif', '.tiff', '.heic', '.heif')
+    # ---- CACHE cepat ----
+    if use_cache and not force_rebuild:
+        cached = _try_load_cache(dataset_path)
+        if cached:
+            KNOWN_ENCODINGS, KNOWN_NAMES = cached
+            FACES_LOADED = True
+            print(f"[INFO] Total wajah dikenal dimuat: {len(KNOWN_ENCODINGS)}")
+            return
 
-    for person_name in os.listdir(dataset_path):
+    # ---- Build list pekerjaan ----
+    jobs: List[Tuple[str, str]] = []
+    for person_name in sorted(os.listdir(dataset_path)):
         person_folder = os.path.join(dataset_path, person_name)
         if not os.path.isdir(person_folder):
             continue
-
         print(f"[INFO] Processing folder for: {person_name}")
-        for file in os.listdir(person_folder):
+        for file in sorted(os.listdir(person_folder)):
             file_path = os.path.join(person_folder, file)
-            if not file.lower().endswith(valid_exts):
-                continue
+            if file.lower().endswith(VALID_EXTS) and os.path.isfile(file_path):
+                jobs.append((file_path, person_name))
 
-            try:
-                # Load → paksa RGB uint8 C-contig writeable → downscale jika perlu
-                img = _load_image_rgb_uint8(file_path)
-                img = _downscale_if_needed(img, MAX_DETECT_WIDTH)
-                img = _coerce_rgb_uint8_c_writeable(img)
+    KNOWN_ENCODINGS, KNOWN_NAMES = [], []
 
-                # Lokasi wajah (HOG → CNN fallback)
-                locs = _detect_locations_rgb(img)
+    # ---- Eksekusi (parallel atau serial) ----
+    if use_parallel:
+        try:
+            from concurrent.futures import ProcessPoolExecutor, as_completed
+            max_workers = max(1, (os.cpu_count() or 4) - 1)
+            with ProcessPoolExecutor(max_workers=max_workers) as ex:
+                futs = [ex.submit(_encode_one, fp, nm) for fp, nm in jobs]
+                for fut in as_completed(futs):
+                    res = fut.result()
+                    if res:
+                        enc, name = res
+                        KNOWN_ENCODINGS.append(enc)
+                        KNOWN_NAMES.append(name)
+        except Exception as e:
+            print("[WARN] Parallel gagal, fallback ke serial:", e)
+            use_parallel = False  # lanjut serial
 
-                # Ambil encoding
-                encs = face_recognition.face_encodings(img, locs)
-                if encs:
-                    # Simpan hanya satu encoding per file (pakai yang pertama)
-                    KNOWN_ENCODINGS.append(encs[0])
-                    KNOWN_NAMES.append(person_name)
-                else:
-                    print(f"[WARNING] Tidak ada wajah terdeteksi di {file_path}")
+    if not use_parallel:
+        for fp, nm in jobs:
+            res = _encode_one(fp, nm)
+            if res:
+                enc, name = res
+                KNOWN_ENCODINGS.append(enc)
+                KNOWN_NAMES.append(name)
 
-            except Exception as e:
-                print(f"[ERROR] Gagal memproses gambar {file_path}: {e}")
+    # ---- Simpan cache ----
+    if use_cache:
+        _save_cache(dataset_path, KNOWN_ENCODINGS, KNOWN_NAMES)
 
     FACES_LOADED = True
     print(f"[INFO] Total wajah dikenal dimuat: {len(KNOWN_ENCODINGS)}")
 
 
-def detect_face_from_image(image_bgr: np.ndarray):
-    """
-    Terima frame OpenCV (BGR), kembalikan nama jika match, else None.
-    """
-    # BGR → RGB
+def detect_face_from_image(image_bgr: np.ndarray) -> Optional[str]:
+    """Terima frame OpenCV (BGR), kembalikan nama jika match, else None."""
     rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
-
-    # Paksa buffer benar + downscale
     rgb = _downscale_if_needed(_coerce_rgb_uint8_c_writeable(rgb), MAX_DETECT_WIDTH)
 
-    # Lokasi + encoding
     locs = _detect_locations_rgb(rgb)
     encs = face_recognition.face_encodings(rgb, locs)
 
+    tol = 1 - FACE_RECOGNITION_THRESHOLD  # konsisten dgn versi kamu sebelumnya
     for enc in encs:
-        matches = face_recognition.compare_faces(
-            KNOWN_ENCODINGS,
-            enc,
-            tolerance=1 - FACE_RECOGNITION_THRESHOLD
-        )
+        matches = face_recognition.compare_faces(KNOWN_ENCODINGS, enc, tolerance=tol)
         if True in matches:
             idx = matches.index(True)
             return KNOWN_NAMES[idx]
